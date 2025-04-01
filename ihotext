@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>艾禾生醫｜我的保健補給測驗</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: #f2f9f6;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      overflow-x: hidden;
+    }
+    header {
+      background-color: #1f3d32;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header img {
+      height: 40px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 2rem auto;
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      color: #1f3d32;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin: 1rem 0 0.5rem;
+      font-weight: bold;
+    }
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+    .step {
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .step.active {
+      display: block;
+    }
+    .submit-btn, .next-btn, .prev-btn {
+      background-color: #1f3d32;
+      color: white;
+      border: none;
+      padding: 1rem;
+      width: 100%;
+      font-size: 1.1rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 1rem;
+    }
+    .submit-btn:hover, .next-btn:hover, .prev-btn:hover {
+      background-color: #2f5c49;
+    }
+    .result {
+      display: none;
+      margin-top: 2rem;
+      background: #e8f5ef;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: bold;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="/mnt/data/艾福X艾沐-04.png" alt="艾禾生醫 Logo">
+  </header>
+  <div class="container">
+    <h1>我的保健補給測驗</h1>
+    <form id="quizForm">
+      <div class="step active">
+        <label for="name">姓名</label>
+        <input type="text" id="name" required>
+        <button type="button" class="next-btn">下一步</button>
+      </div>
+      <div class="step">
+        <label>性別</label>
+        <select id="gender">
+          <option value="male">男</option>
+          <option value="female">女</option>
+          <option value="other">其他</option>
+        </select>
+        <button type="button" class="prev-btn">上一步</button>
+        <button type="button" class="next-btn">下一步</button>
+      </div>
+      <div class="step">
+        <label>年齡</label>
+        <select id="age">
+          <option value="18-24">18-24歲</option>
+          <option value="25-34">25-34歲</option>
+          <option value="35-44">35-44歲</option>
+          <option value="45+">45歲以上</option>
+        </select>
+        <button type="button" class="prev-btn">上一步</button>
+        <button type="button" class="next-btn">下一步</button>
+      </div>
+      <div class="step" id="femaleExtra">
+        <label>目前狀態</label>
+        <select id="femaleStatus">
+          <option value="none">無</option>
+          <option value="pregnant">懷孕中</option>
+          <option value="postpartum">產後</option>
+          <option value="nursing">哺乳中</option>
+        </select>
+        <button type="button" class="prev-btn">上一步</button>
+        <button type="button" class="next-btn">下一步</button>
+      </div>
+      <div class="step">
+        <label>請選出你最想改善的健康困擾（可複選）</label>
+        <label><input type="checkbox" value="fatigue"> 容易疲勞／沒精神</label>
+        <label><input type="checkbox" value="sleep"> 睡不好／淺眠</label>
+        <label><input type="checkbox" value="skin"> 肌膚乾燥／痘痘</label>
+        <label><input type="checkbox" value="digestion"> 消化不良／便祕</label>
+        <label><input type="checkbox" value="weight"> 體重控制困難</label>
+        <label><input type="checkbox" value="circulation"> 手腳冰冷／肩頸痠痛</label>
+        <button type="button" class="prev-btn">上一步</button>
+        <button class="submit-btn" type="submit">送出測驗結果</button>
+      </div>
+    </form>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const steps = document.querySelectorAll('.step');
+    const nextBtns = document.querySelectorAll('.next-btn');
+    const prevBtns = document.querySelectorAll('.prev-btn');
+    const genderSelect = document.getElementById('gender');
+    const femaleExtra = document.getElementById('femaleExtra');
+    let currentStep = 0;
+
+    nextBtns.forEach(btn => btn.addEventListener('click', () => {
+      if (currentStep === 1 && genderSelect.value === 'female') {
+        goToStep(currentStep + 1); // 顯示女性專屬題
+      } else if (currentStep === 1 && genderSelect.value !== 'female') {
+        goToStep(currentStep + 2); // 跳過女性專屬題
+      } else {
+        goToStep(currentStep + 1);
+      }
+    }));
+
+    prevBtns.forEach(btn => btn.addEventListener('click', () => {
+      if (currentStep === 3 && genderSelect.value !== 'female') {
+        goToStep(currentStep - 2);
+      } else {
+        goToStep(currentStep - 1);
+      }
+    }));
+
+    function goToStep(step) {
+      steps[currentStep].classList.remove('active');
+      currentStep = step;
+      steps[currentStep].classList.add('active');
+    }
+
+    const form = document.getElementById('quizForm');
+    const resultBox = document.getElementById('result');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const checkboxes = form.querySelectorAll('input[type="checkbox"]:checked');
+      const selected = Array.from(checkboxes).map(c => c.value);
+      const recommendations = [];
+      if (selected.includes('fatigue')) recommendations.push('B群、高蛋白代餐');
+      if (selected.includes('sleep')) recommendations.push('馬卡、B群');
+      if (selected.includes('skin')) recommendations.push('膠原蛋白、B群');
+      if (selected.includes('digestion')) recommendations.push('高蛋白代餐');
+      if (selected.includes('weight')) recommendations.push('白腎豆、高蛋白代餐');
+      if (selected.includes('circulation')) recommendations.push('蚓激酶、B群');
+      resultBox.style.display = 'block';
+      resultBox.innerHTML = `<h3>艾禾生醫為您推薦的保健組合：</h3><p>${[...new Set(recommendations)].join('、')}</p>`;
+    });
+  </script>
+</body>
+</html>
