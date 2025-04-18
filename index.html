@@ -91,20 +91,76 @@
       display: none;
     }
 
-    .result-card {
-      background: #f6faf4;
-      border: 1px solid #d6e5d2;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
     .card-list {
       display: grid;
-      gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      margin-top: 16px;
+      grid-template-columns: repeat(3, 1fr); /* 一排三張 */
+      gap: 24px; /* 卡片間距 */
+      margin-top: 20px;
+      margin-bottom: 32px;
+    }
+
+    .result-card {
+      background: #f8fbf6;
+      border: 1px solid #d8e6d2;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      min-height: 460px; /* ✅ 固定高度防止高低不齊 */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease;
+    }
+
+    .result-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background-color: #f0f0f0;
+      display: block;
+    }
+    
+    @media (max-width: 768px) {
+      .card-list {
+        grid-template-columns: repeat(2, 1fr); /* 平板以下變兩欄 */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card-list {
+        grid-template-columns: 1fr; /* 手機變一欄 */
+      }
+    }
+
+
+    .result-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .total-summary {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 32px;
+      margin-top: 32px;
+    }
+
+    .total-box {
+      background-color: #f2f9f1;
+      padding: 24px 32px;
+      border: 1px solid #d1e6d3;
+      border-radius: 16px;
+      min-width: 240px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #3a5f3a;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease;
     }
 
     #results p {
@@ -129,31 +185,44 @@
     </div>
 
     <div id="results" class="hidden">
-      <h2>推薦產品</h2>
-      <div id="priority-section">
-        <h3>優先推薦（主推產品）</h3>
-        <div class="card-list" id="priority-list"></div>
-        <p><strong>主推總金額：</strong><span id="priority-total">0</span></p>
-      </div>
-      <div id="optional-section">
-        <h3>加購推薦</h3>
-        <div class="card-list" id="optional-list"></div>
-      </div>
-      <p><strong>總推薦金額：</strong><span id="all-total">0</span></p>
-    </div>
-    <div class="button-group" style="margin-top: 40px;">
-  <a href="https://www.i-oh.com.tw/collections/ihohealth" target="_blank">
-    <button>🛍 馬上前往購買</button>
-  </a>
-  <a href="https://lin.ee/dvY52wQ" target="_blank">
-    <button>💬 諮詢營養師</button>
-  </a>
-</div>
+      <h2>🎯 專屬健康提案</h2>
+      <div class="card-list" id="priority-list"></div>
 
+      <h2>✨ 額外補充建議</h2>
+      <div class="card-list" id="optional-list"></div>
+
+      <div class="total-summary">
+        <div class="total-box">
+          <div style="font-size: 16px; margin-bottom: 8px;">專屬提案金額：</div>
+          <div style="font-size: 24px;" id="priority-total">$0</div>
+        </div>
+        <div class="total-box">
+          <div style="font-size: 16px; margin-bottom: 8px;">額外補充金額：</div>
+          <div style="font-size: 24px;" id="optional-total">$0</div>
+        </div>
+      </div>
+      <div class="button-group" style="margin-top: 40px;">
+        <a href="https://www.i-oh.com.tw/collections/ihohealth" target="_blank">
+          <button>🛍 馬上前往購買</button>
+        </a>
+        <a href="https://lin.ee/dvY52wQ" target="_blank">
+          <button>💬 諮詢營養師</button>
+        </a>
+      </div>
+    </div>
   </div>
 
   <script>
- const quizData = [
+    function restartQuiz() {
+      location.reload();
+    }
+
+    // 以下為 JS 題目 + 評分邏輯，太長的部分建議抽出成 script.js
+    // 如果你需要，我也可以幫你完成這段整合
+
+    // ⏳ 若你希望我幫你一起拆成 script.js、題庫檔案 quiz-data.js，
+    // 或自動化推薦後連接購物車，也都可以協助！
+   const quizData = [
   {
     title: "1️⃣ 請問您的性別是？",
     type: "radio",
@@ -471,6 +540,7 @@
       priorityList.innerHTML = priority.map(card).join("");
       optionalList.innerHTML = optional.map(card).join("");
       priorityTotal.textContent = `$${priorityTotalVal}`;
+      document.getElementById("optional-total").textContent = `$${total - priorityTotalVal}`;
       allTotal.textContent = `$${total}`;
       progressBar.style.width = `100%`;
     }
@@ -493,6 +563,6 @@
     });
 
     renderQuestion();
-  </script>
+    </script>
 </body>
 </html>
